@@ -1,7 +1,7 @@
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
-# from langchain_ollama import ChatOllama
-# from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import ChatOllama
+from langchain_core.prompts import ChatPromptTemplate
 
 def similarRetrieval(query, persist_db='db/chroma_db'):
     """This function creates embedding of query and does similarity search"""
@@ -27,34 +27,34 @@ def similarRetrieval(query, persist_db='db/chroma_db'):
 
 
 
-# if __name__ == "__main__":
-#     query = "Does nature helps men?"
-#     relevant_docs = similarRetrieval(query)
-#     doc_text = chr(10).join([f"-{doc.page_content}" for doc in relevant_docs])
+if __name__ == "__main__":
+    query = "Does nature helps men?"
+    relevant_docs = similarRetrieval(query)
+    doc_text = chr(10).join([f"-{doc.page_content}" for doc in relevant_docs])
     
-#     prompt = ChatPromptTemplate.from_template("""
-#         Based on the following documents, answer the question.
+    prompt = ChatPromptTemplate.from_template("""
+        Based on the following documents, answer the question.
 
-#         Question:
-#         {query}
+        Question:
+        {query}
 
-#         Documents:
-#         {docs}
+        Documents:
+        {docs}
 
-#         Please provide the answer based only on these documents.
-#         If the answer is not present, return "None".
-#         """)
+        Please provide the answer based only on these documents.
+        If the answer is not present, return "None".
+        """)
     
-#     model = ChatOllama(
-#         model= "gemma3:latest",
-#         temperature=0
-#         )
+    model = ChatOllama(
+        model= "gemma3:latest",
+        temperature=0
+        )
     
-#     chain = prompt | model
+    chain = prompt | model
 
-#     response = chain.invoke({
-#         "query": query,
-#         "docs": doc_text
-#     })
+    response = chain.invoke({
+        "query": query,
+        "docs": doc_text
+    })
     
-#     print(response.content)
+    print(response.content)

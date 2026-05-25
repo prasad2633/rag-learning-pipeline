@@ -1,6 +1,6 @@
-from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from retrieval_pipeline import similarRetrieval
+from model_utils.initialize_models import ModelLoader
 
 def generateResponse(query, relevant_docs):
     """ 
@@ -21,11 +21,7 @@ def generateResponse(query, relevant_docs):
         Please provide the answer based only on these documents.
         If the answer is not present, return "None".
         """)
-    
-    model = ChatOllama(
-        model= "gemma3:latest",
-        temperature=0
-        )
+    model = ModelLoader.load_model()
     
     chain = prompt | model
 
