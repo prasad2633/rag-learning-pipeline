@@ -11,7 +11,7 @@ def askQuestion(user_question):
         messages = [SystemMessage(content="Given the chat history, rewrite the new question to be standalone and searchable. Just rewritten question.")] + chat_history + [
             HumanMessage(content=f"New Question: {user_question}")
             ]
-        model = ModelLoader.load_model()
+        model = ModelLoader.load_ollama_model()
         result = model.invoke(messages)
         search_question = result.content.strip()
         print(f"Searching for: {search_question}")
@@ -21,8 +21,11 @@ def askQuestion(user_question):
         print(f"Searching for: {search_question}")
 
     relevant_docs = similarRetrieval(search_question)
+    
     result = generateResponse(search_question, relevant_docs)
+    
     answer = result.content
+    
     chat_history.append(HumanMessage(content=user_question))
     chat_history.append(AIMessage(content=answer))
 
