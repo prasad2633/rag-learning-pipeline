@@ -5,6 +5,7 @@ from langchain_text_splitters import (
 from langchain_ollama import OllamaEmbeddings
 from langchain_experimental.text_splitter import SemanticChunker 
 from model_utils.initialize_models import ModelLoader
+from langchain_core.documents import Document
 
 class TextSplitterLoader:
     """
@@ -45,17 +46,59 @@ class TextSplitterLoader:
         prompt = f"""
         You are a text chunking expert. Split this text into logical chunks.
 
-        Rules:
-        - Each chunk should be 200 characters or less.
-        - Split at natural topic boundaries.
-        - Keep related information together.
-        - Put '<<<SPLIT>>>' between chunks.
+        Your task:
+        Split the text into MULTIPLE chunks.
+
+        STRICT RULES:
+        1. You MUST split the text.
+        2. Each chunk MUST be less than 500 characters.
+        3. Never return the full text as one chunk.
+        4. Split at natural topic or sentence boundaries.
+        5. Keep related information together.
+        6. Place <<<SPLIT>>> ONLY between chunks.
+        7. Do not explain your reasoning.
+        8. Output ONLY the chunked text.
 
         Text:
         {raw_data}
 
         Return the text with '<<<SPLIT>>>' markers where you want to split:
         """
-        llm = ModelLoader.load_ollama_model()
+        
         print("Asking AI to chunk the text...")
-        response = llm.invoke(prompt)    
+        
+        llm = ModelLoader.load_ollama_model()
+        response = llm.invoke(prompt)
+
+        marked_text = response.content
+        chunks = marked_text.split("<<<SPLIT>>>")
+
+        print(chunks)
+
+        # clean up white spaces
+        cleaned_chunks = []
+        try:
+            for chunk in chunks:
+                cleaned_ck = chunk.strip()
+                
+                if cleaned_ck:
+                    cleaned_chunks.append(
+                        Document(
+                            page_content=cleaned_ck,
+                            metadata={
+                                "chunking_method": "agentic"
+                                }
+                            )
+                        )
+
+        except Exception as e:
+            print(f"Error while cleaning the chunks:\n {e}")
+
+        print("\n AGENTIC AI CHUNKING RESULTS:")    
+        print("=" * 50)
+        
+        # testing the chunks:
+        for i, chunk in enumerate(cleaned_chunks, 1):
+            print(f"\nThe cleaned chunk {i}: {chunk}")
+
+        return cleaned_chunks

@@ -3,6 +3,7 @@ from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
+from utils.text_splitters import TextSplitterLoader
 
 def docLoad(folder_path):
     """Load all documents from the directory"""
@@ -27,14 +28,16 @@ def docChunk(documents, chunk_size = 100, chunk_overlap = 0):
     """Chunks the document"""
     print("Splitting documents in chunks")
     
-    text_splitter = CharacterTextSplitter(
+    text_splitter = TextSplitterLoader.characterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap
         )
     
-    chunk = text_splitter.split_documents(documents)
+    chunks = text_splitter.split_documents(documents)
 
-    return chunk
+    # chunks = TextSplitterLoader.agenticTextSplitter(documents)
+
+    return chunks
 
 def chunkEmbedding(chunks, persist_directory="db/chroma_db"):
     """Creates embeddings of the chunks"""
